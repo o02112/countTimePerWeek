@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>倒计时</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+
+	<!--[if lt IE 9]>
+		<script src="js/html5shiv.min.js"></script>
+	<![endif]-->
+</head>
+<body>
+	<section id="sec1">
+		<div class="content">
+			<b></b>
+			<p>本周四晚上20:30
+				<span id="t-days"></span><strong>天</strong>
+				<span id="t-hours"></span><strong>时</strong>
+				<span id="t-minutes"></span><strong>分</strong>
+				<span id="t-seconds"></span><strong>秒</strong>
+			</p>
+		</div>
+	</section>
+
+<script type="text/javascript">
+
+countTime(
+	{ // 表示周四20:30（指定时间点）
+		theDay: 4,
+		theHours: 20,
+		theMinutes: 30,
+		theSeconds: 0
+	},
+	{
+		elDays: 't-days',
+		elHours: 't-hours',
+		elMinutes: 't-minutes',
+		elSeconds: 't-seconds'
+	}
+);
+
+function countTime ( timePoint, showEle ) {
+
+	var oneDay = 24*60*60*1000; // 一天有多少毫秒
+	var oneHour = 60*60*1000; // 一小时多少毫秒
+	var oneMinute = 60*1000; // 一分钟多少毫秒
+	var oneSecond = 1000; // 一秒多少毫秒
+
+	var theTime = 0; // milliseconds 毫秒数，下一个指定时间点的时间戳
+
+
+	// 求当前时间与指定时间，相差的毫秒数
+	var getDifferTime = function (){
+
+		var date = new Date(); // 当前日期对象
+		var curTime = date.getTime(); // 当前时间戳
+		var curDay = date.getDay(); // 当前周几
+		curDay = (curDay==0) ? 7 : curDay; //为方便计算把周日为0，改为7
+
+		// 判断当前时间是否经过了一天中指定的时间点 (时，分，秒)
+		var passedTheTime = function(theHours, theMinutes, theSeconds){
+			var curHours = date.getHours();
+			var curMinutes = date.getMinutes();
+			var curSeconds = date.getSeconds();
+			if( (curHours-theHours) > 0 ){
+				return true;
+			} else if ( (curHours-theHours) < 0 ) {
+				return false;
+			} else if ( (curHours-theHours) == 0 ) {
+				if( (curMinutes-theMinutes) > 0 ){
+					return true;
+				} else if ( (curMinutes-theMinutes) < 0 ) {
+					return false;
+				} else if ( (curMinutes-theMinutes) == 0 ) {
+					if( (curSeconds-theSeconds) > 0 ){
+						return true;
+					} else if ( (curSeconds-theSeconds) < 0 ) {
+						return false;
+					} else if ( (curSeconds-theSeconds) == 0 ) {
+						return false;
+					}
+				}
+			}
+		}
+
+
+		// 取得下一个指定时间点，时间戳
+		if( 
+			(curDay > timePoint.theDay) || 
+			(
+				(curDay == timePoint.theDay) && 
+				passedTheTime(timePoint.theHours, timePoint.theMinutes, timePoint.theSeconds)
+			)
+		) { 
+			timePoint.theDay = timePoint.theDay + 7;
+		}
+
+
+		// 通过日期的字符串表示方法，获取指定时间的时间戳
+		// Date.parse('2016/10/20 20:30:00')  1476966600000
+		// 
+		theTime = Date.parse(
+			date.getFullYear()+'/'+
+			(date.getMonth()+1)+'/'+
+			(date.getDate()+timePoint.theDay-curDay) + ' ' +
+			timePoint.theHours + ':'+timePoint.theMinutes+':' + timePoint.theSeconds
+		);
+
+
+		// 时间戳相减，获取两个时间戳之间毫秒数相差多少；
+		// 根据相差的毫秒数，求相差的天数、小时数、分钟数和秒数；
+		// 
+
+		return theTime - curTime;
+	}
+
+
+	var showDifferTime = function (differTime){
+
+		// 倒计时计数
+		// var differTime = 0; // 当前时间与指定时间相差的毫秒数
+
+		var showDay = 0; // 相差多少天，用于页面显示
+		var showHours = 0; // 多少小时
+		var showMinutes = 0; // 多少分钟
+		var showSeconds = 0; // 多少秒
+
+		// 相差的毫秒数，先判断是否满足1天的量，
+		// 再判断是否满足1小时的量、1分钟的量、1秒的量，分别取出
+		// 从大范围到小范围计算
+
+		// 相差大于一天
+		if(differTime > oneDay){
+
+			// 相差大于一天
+			showDay = Math.floor(differTime / oneDay); // 得到相差天数
+			
+			 // 去掉相差天数，也就是 1天毫秒数的整数倍；
+			differTime -= oneDay*showDay;
+		}
+
+		// 相差大于1小时
+		if(differTime > oneHour){
+
+			showHours = Math.floor(differTime / oneHour);
+
+			differTime -= oneHour*showHours;
+		}
+
+		// 相差大于1分钟
+		if(differTime > oneMinute){
+			showMinutes = Math.floor(differTime / oneMinute);
+
+			differTime -= oneMinute*showMinutes;
+		}
+
+		// 相差大于1秒
+		if(differTime > oneSecond){
+			showSeconds = Math.floor(differTime / oneSecond);
+		}
+
+		// 前导0
+		showDay = showDay<10 ? '0'+showDay : showDay;
+		showHours = showHours<10 ? '0'+showHours : showHours;
+		showMinutes = showMinutes<10 ? '0'+showMinutes : showMinutes;
+		showSeconds = showSeconds<10 ? '0'+showSeconds : showSeconds;
+		
+		document.getElementById(showEle.elDays).innerHTML = showDay;
+		document.getElementById(showEle.elHours).innerHTML = showHours;
+		document.getElementById(showEle.elMinutes).innerHTML = showMinutes;
+		document.getElementById(showEle.elSeconds).innerHTML = showSeconds;
+
+	}
+
+
+	var countingTime = function (){
+
+		timeLeft = getDifferTime();
+
+		setInterval(function(){
+			
+			// 重新计时
+			if(timeLeft <= 0){
+				timeLeft = getDifferTime();
+			}else {
+				showDifferTime(timeLeft);
+			}
+			timeLeft -= 1000;
+		}, oneSecond);
+
+	}
+
+	countingTime();
+}
+
+</script>
+</body>
+</html>
