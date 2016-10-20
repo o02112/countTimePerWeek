@@ -1,1 +1,9 @@
+* { margin:0; padding:0; }
+body { font-family: "Microsoft YaHei"; background-color:white; }
 
+#sec1 {  height:120px; background-color:#da5211; }
+#sec1 .content {  position:relative; }
+#count-img { position:absolute; margin-top:-70px; margin-left:45px; }
+#sec1 p { margin-left:270px; padding-top:20px; font-size:50px; color:#f3e126; font-weight:bold; }
+#sec1 p span { min-width:44px; text-align:center; display:inline-block; padding:12px 18px; background-color:white; box-shadow: 3px 3px 6px rgba(0, 0, 0, .6) inset; border-radius: 9px; font-size: 36px; color: #54565a; }
+#sec1 p strong { font-size:47px; margin:0 2px 0 12px; color:white; }
